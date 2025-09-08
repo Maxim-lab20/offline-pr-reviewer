@@ -22,9 +22,6 @@ __pycache__/
 # Ollama related cache/config
 ollama_cache/
 
-# RAG context directory
-RAG_CONTEXT/
-
 # Logs
 *.log
 
