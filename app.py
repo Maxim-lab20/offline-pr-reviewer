@@ -1,9 +1,6 @@
-import logging
 from flask import Flask, request, jsonify
 from service.llm_service import LLMService
 from service.review_service import ReviewService
-
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 app = Flask(__name__)
 

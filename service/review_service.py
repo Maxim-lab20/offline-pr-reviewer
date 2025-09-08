@@ -1,16 +1,19 @@
-import logging
-
 from agents.default_agent import DefaultCodeReviewAgent
 from agents.java_agent import JavaCodeReviewAgent
 from agents.orchestrator_agent import OrchestratorAgent
 from service.llm_service import LLMService
+from service.rag_service import RAGService # Import RAGService
+import os
 
-logger = logging.getLogger(__name__)
 
 class ReviewService:
     def __init__(self):
-        logger.info("Initializing ReviewService...")
         self.llm_service = LLMService(model_name="gemma:2b")
+        
+        # Initialize RAGService
+        self.rag_service = RAGService(document_paths=["RAG_CONTEXT/java_code_standards.txt", "RAG_CONTEXT/python_code_standards.txt"]) # Initialize RAGService with the new files
+
+        # Configure agents
         self.java_agent = JavaCodeReviewAgent(self.llm_service)
         self.default_agent = DefaultCodeReviewAgent(self.llm_service)
 
@@ -19,12 +22,11 @@ class ReviewService:
             "default": self.default_agent
         }
         self.orchestrator = OrchestratorAgent(self.agents)
-        logger.info("ReviewService initialized.")
 
     def decide_and_review(self, code_snippet: str) -> str:
-        logger.info(f"Deciding agent for code snippet: {code_snippet[:100]}...")
-        selected_agent = self.orchestrator.decide_agent(code_snippet)
-        logger.info(f"Selected agent: {selected_agent.__class__.__name__}")
-        review_result = selected_agent.review(code_snippet)
-        logger.info("Code review completed.")
+        # Retrieve context from RAG
+        retrieved_context = self.rag_service.retrieve_context(code_snippet)
+
+        # Orchestrate the review using the OrchestratorAgent
+        review_result = self.orchestrator.orchestrate_review(code_snippet, retrieved_context)
         return review_result
