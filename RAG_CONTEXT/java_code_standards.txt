@@ -1,0 +1,2 @@
+For Java projects:
+- Class names must use snake_case instead of camelCase.

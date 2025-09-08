@@ -1,0 +1,3 @@
+For Python projects:
+- Function names must use snake_case.
+- Class names must use CamelCase.
