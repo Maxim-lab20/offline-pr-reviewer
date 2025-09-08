@@ -1,10 +1,14 @@
+import logging
 from flask import Flask, request, jsonify
-from llm_service import LLMService
+from service.llm_service import LLMService
+from service.review_service import ReviewService
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 app = Flask(__name__)
 
-# Initialize the service with Ollama model
 llm_service = LLMService(model_name="gemma:2b")
+review_service = ReviewService()
 
 @app.route("/ask", methods=["POST"])
 def ask():
@@ -15,6 +19,17 @@ def ask():
 
     response = llm_service.ask(question)
     return jsonify({"answer": response})
+
+@app.route("/review", methods=["POST"])
+def review_pr():
+    data = request.get_json()
+    code_snippet = data.get("code_snippet", "")
+    if not code_snippet:
+        return jsonify({"error": "No code snippet provided"}), 400
+
+    review_result = review_service.decide_and_review(code_snippet)
+
+    return jsonify({"review": review_result})
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
