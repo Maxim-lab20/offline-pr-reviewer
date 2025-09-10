@@ -4,7 +4,7 @@ from service.review_service import ReviewService
 
 app = Flask(__name__)
 
-llm_service = LLMService(model_name="gemma:2b")
+llm_service = LLMService()
 review_service = ReviewService()
 
 @app.route("/ask", methods=["POST"])

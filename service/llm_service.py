@@ -2,8 +2,8 @@ import ollama
 
 
 class LLMService:
-    def __init__(self, model_name: str):
-        self.model_name = model_name
+    def __init__(self):
+        self.model_name = "gemma:2b"
 
     def ask(self, prompt: str, context: str = "") -> str:
         full_prompt = f"Context: {context}\n\nQuestion: {prompt}" if context else prompt
