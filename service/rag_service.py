@@ -6,7 +6,7 @@ from langchain_community.vectorstores import FAISS
 
 class RAGService:
     def __init__(self):
-        self.document_paths = ["RAG_CONTEXT/java_code_standards.txt", "RAG_CONTEXT/python_code_standards.txt"]
+        self.document_paths = ["RAG_CONTEXT/java_code_standards.txt", "RAG_CONTEXT/default_code_standards.txt"]
         self.embedding_model_name = "sentence-transformers/all-MiniLM-L6-v2"
         self.vectorstore = None
         self._initialize_vectorstore()
