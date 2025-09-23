@@ -1,10 +1,10 @@
 from flask import Flask, request, jsonify
-from service.llm_service import LLMService
+from service.gemini_llm_service import GeminiLLMService
 from service.review_service import ReviewService
 
 app = Flask(__name__)
 
-llm_service = LLMService()
+llm_service = GeminiLLMService()
 review_service = ReviewService()
 
 @app.route("/ask", methods=["POST"])

@@ -2,11 +2,11 @@ from typing import Dict, Type
 from agents.code_review_agents import CodeReviewAgent
 from agents.default_agent import DefaultCodeReviewAgent
 from agents.java_agent import JavaCodeReviewAgent
-from service.llm_service import LLMService
+from service.offline_llm_service import OfflineLLMService
 
 class OrchestratorAgent:
     def __init__(self):
-        self.llm_service = LLMService()
+        self.llm_service = OfflineLLMService()
         self.java_agent = JavaCodeReviewAgent(self.llm_service)
         self.default_agent = DefaultCodeReviewAgent(self.llm_service)
 

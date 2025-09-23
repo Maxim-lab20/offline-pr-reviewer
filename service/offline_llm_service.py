@@ -1,7 +1,7 @@
 import ollama
 
 
-class LLMService:
+class OfflineLLMService:
     def __init__(self):
         self.model_name = "gemma:2b"
 

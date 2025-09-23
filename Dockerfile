@@ -21,4 +21,5 @@ COPY . .
 EXPOSE 5000
 
 # Use the entrypoint script to set up Ollama and then run the app
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+# disable offline llm for now
+# ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

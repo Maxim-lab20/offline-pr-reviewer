@@ -1,9 +1,9 @@
 from agents.code_review_agents import CodeReviewAgent
-from service.llm_service import LLMService
+from service.offline_llm_service import OfflineLLMService
 
 
 class DefaultCodeReviewAgent(CodeReviewAgent):
-    def __init__(self, llm_service: LLMService):
+    def __init__(self, llm_service: OfflineLLMService):
         super().__init__(llm_service)
 
     def review(self, code_snippet: str, context: str = "") -> str:
