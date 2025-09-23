@@ -1,11 +1,9 @@
 from agents.orchestrator_agent import OrchestratorAgent
-from service.offline_llm_service import OfflineLLMService
 from service.rag_service import RAGService # Import RAGService
 
 
 class ReviewService:
     def __init__(self):
-        self.llm_service = OfflineLLMService()
         self.rag_service = RAGService()
         self.orchestrator = OrchestratorAgent()
 

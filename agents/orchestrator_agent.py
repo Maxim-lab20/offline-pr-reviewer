@@ -2,13 +2,12 @@ from typing import Dict, Type
 from agents.code_review_agents import CodeReviewAgent
 from agents.default_agent import DefaultCodeReviewAgent
 from agents.java_agent import JavaCodeReviewAgent
-from service.offline_llm_service import OfflineLLMService
+from service.gemini_llm_service import GeminiLLMService
 
 class OrchestratorAgent:
     def __init__(self):
-        self.llm_service = OfflineLLMService()
-        self.java_agent = JavaCodeReviewAgent(self.llm_service)
-        self.default_agent = DefaultCodeReviewAgent(self.llm_service)
+        self.java_agent = JavaCodeReviewAgent()
+        self.default_agent = DefaultCodeReviewAgent()
 
         self.agents = {
             "java": self.java_agent,
