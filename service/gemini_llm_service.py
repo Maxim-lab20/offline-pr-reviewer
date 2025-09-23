@@ -4,7 +4,7 @@ import google.generativeai as genai
 
 class GeminiLLMService:
     def __init__(self):
-        genai.configure(api_key='')
+        genai.configure(api_key=os.environ.get("GOOGLE_API_KEY"))
         self.model = genai.GenerativeModel('models/gemini-1.5-flash')
 
     def ask(self, prompt: str):
