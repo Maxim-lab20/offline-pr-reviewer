@@ -1,0 +1,33 @@
+# Byte-code files
+__pycache__/
+*.pyc
+*.pyd
+*.pyo
+
+# IDE-specific files
+.vscode/
+.idea/
+
+# Environment variables
+.env
+.flaskenv
+
+# Database files
+*.db
+*.sqlite
+
+# Uploaded files
+/uploads/
+
+# Ollama related cache/config
+ollama_cache/
+
+# Logs
+*.log
+
+# Virtual environment
+virtualenv/
+vitalenv/
+.venv/
+env/
+venv/
