@@ -1,2 +1,0 @@
-For Python projects:
-- Class names must use CamelCase.

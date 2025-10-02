@@ -3,6 +3,8 @@ from flask import Flask, request, jsonify
 from github import Github
 from service.gemini_llm_service import GeminiLLMService
 from service.review_service import ReviewService
+from service.rag_service import RAGService
+from langchain_core.documents import Document
 
 app = Flask(__name__)
 
@@ -13,6 +15,7 @@ g = Github(github_token)
 
 llm_service = GeminiLLMService()
 review_service = ReviewService()
+rag_service = RAGService()
 
 @app.route("/ask", methods=["POST"])
 def ask():
@@ -34,6 +37,20 @@ def review_pr():
     review_result = review_service.decide_and_review(code_snippet)
 
     return jsonify({"review": review_result})
+
+@app.route("/ingest", methods=["POST"])
+def ingest_documents_endpoint():
+    if 'file' not in request.files:
+        return jsonify({"error": "No file part in the request"}), 400
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({"error": "No selected file"}), 400
+    if file:
+        file_content = file.read().decode('utf-8')
+        document = Document(page_content=file_content, metadata={"source": file.filename})
+        rag_service.ingest_documents([document])
+        return jsonify({"status": "success", "message": f"File {file.filename} ingested successfully."}), 200
+    return jsonify({"error": "An unexpected error occurred"}), 500
 
 @app.route("/github-webhook", methods=["POST"])
 def github_webhook():
