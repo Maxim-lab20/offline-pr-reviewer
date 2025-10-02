@@ -42,15 +42,43 @@ def review_pr():
 def ingest_documents_endpoint():
     if 'file' not in request.files:
         return jsonify({"error": "No file part in the request"}), 400
+
     file = request.files['file']
     if file.filename == '':
         return jsonify({"error": "No selected file"}), 400
-    if file:
+
+    try:
+        # Read file content as text
         file_content = file.read().decode('utf-8')
-        document = Document(page_content=file_content, metadata={"source": file.filename})
-        rag_service.ingest_documents([document])
-        return jsonify({"status": "success", "message": f"File {file.filename} ingested successfully."}), 200
-    return jsonify({"error": "An unexpected error occurred"}), 500
+
+        # Wrap in Document object
+        document = Document(
+            page_content=file_content,
+            metadata={"source": file.filename}
+        )
+
+        # Ingest into vectorstore
+        rag_service.ingest_document([document])
+
+        return jsonify({
+            "status": "success",
+            "message": f"File {file.filename} ingested successfully."
+        }), 200
+
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": f"Error ingesting file {file.filename}: {e}"
+        }), 500
+
+@app.route("/documents", methods=["GET"])
+def list_documents_endpoint():
+    try:
+        limit = int(request.args.get("limit", 10))  # default = 10
+        docs = rag_service.list_documents(limit=limit)
+        return jsonify({"status": "success", "documents": docs}), 200
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 @app.route("/github-webhook", methods=["POST"])
 def github_webhook():

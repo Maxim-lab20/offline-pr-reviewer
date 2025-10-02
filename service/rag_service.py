@@ -1,50 +1,60 @@
 from langchain_community.document_loaders import TextLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_community.vectorstores import Weaviate
-from weaviate.client import WeaviateClient
-from weaviate import connect_to_local
+from langchain_weaviate import WeaviateVectorStore
+from langchain.schema import Document
+import weaviate
 
 
 class RAGService:
     def __init__(self):
         self.embedding_model_name = "sentence-transformers/all-MiniLM-L6-v2"
-        self.vectorstore = None
-        self.weaviate_client = connect_to_local()
-        self.collection_name = "CodeStandards"
-        self._initialize_vectorstore()
+        self.embeddings = HuggingFaceEmbeddings(model_name=self.embedding_model_name)
+        self.index_name = "Test"
+        self.text_key = "text"
 
-    def _initialize_vectorstore(self):
-        try:
-            if self.weaviate_client.collections.exists(self.collection_name):
-                self.vectorstore = Weaviate(client=self.weaviate_client, collection_name=self.collection_name, embedding=HuggingFaceEmbeddings(model_name=self.embedding_model_name))
-                return
-            
-            # If the collection does not exist, create an empty one
-            self.weaviate_client.collections.create(self.collection_name)
-            self.vectorstore = Weaviate(client=self.weaviate_client, collection_name=self.collection_name, embedding=HuggingFaceEmbeddings(model_name=self.embedding_model_name))
-        except Exception as e:
-            print(f"Error initializing vectorstore: {e}")
-            self.vectorstore = None
+    def ingest_document(self, documents: list[Document]):
+        """Ingests a list of LangChain Document objects"""
+        # Split into chunks
+        splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
+        split_docs = splitter.split_documents(documents)
 
-    def ingest_documents(self, documents):
-        try:
-            text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
-            texts = text_splitter.split_documents(documents)
-            embeddings = HuggingFaceEmbeddings(model_name=self.embedding_model_name)
-            if self.vectorstore:
-                self.vectorstore.add_documents(texts)
-            else:
-                self.vectorstore = Weaviate.from_documents(texts, embeddings, client=self.weaviate_client, collection_name=self.collection_name)
-            print(f"Successfully ingested {len(documents)} documents.")
-        except Exception as e:
-            print(f"Error ingesting documents: {e}")
+        # Add docs into Weaviate
+        with weaviate.connect_to_local() as client:
+            vectorstore = WeaviateVectorStore(
+                client=client,
+                index_name=self.index_name,
+                text_key=self.text_key,
+                embedding=self.embeddings,
+            )
+            vectorstore.add_documents(split_docs)
+
+    def list_documents(self, limit: int = 10):
+        """Fetch ingested documents from Weaviate v4"""
+        with weaviate.connect_to_local() as client:
+            collection = client.collections.get(self.index_name)
+
+            # Fetch documents
+            results = collection.query.fetch_objects(limit=limit)
+
+            # Convert to a simple list of dicts
+            docs = []
+            for o in results.objects:
+                props = o.properties
+                props["uuid"] = str(o.uuid)  # include ID for reference
+                docs.append(props)
+
+        return docs
 
     def retrieve_context(self, query: str, k: int = 4) -> str:
-        if not self.vectorstore:
-            print("Vectorstore not initialized. Cannot retrieve context.")
-            return ""
-        
-        docs = self.vectorstore.similarity_search(query, k=k)
-        context = "\n\n".join([doc.page_content for doc in docs])
-        return context
+        """Retrieve top-k similar docs as context"""
+        with weaviate.connect_to_local() as client:
+            vectorstore = WeaviateVectorStore(
+                client=client,
+                index_name=self.index_name,
+                text_key=self.text_key,
+                embedding=self.embeddings,
+            )
+            docs = vectorstore.similarity_search(query, k=k)
+
+        return "\n\n".join([doc.page_content for doc in docs])
