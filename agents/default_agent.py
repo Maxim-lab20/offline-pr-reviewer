@@ -1,11 +1,11 @@
 from agents.code_review_agents import CodeReviewAgent
-from service.llm.gemini_llm_service import GeminiLLMService
+from service.llm.gpt_llm_service import GPTLLMService
 from typing_extensions import override
 
 
 class DefaultCodeReviewAgent(CodeReviewAgent):
     def __init__(self):
-        self.llm_service = GeminiLLMService()
+        self.llm_service = GPTLLMService()
 
     @override
     def review(self, code_snippet: str, context: str = "") -> str:

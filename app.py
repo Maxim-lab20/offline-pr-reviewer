@@ -1,7 +1,7 @@
 import os
 from flask import Flask, request, jsonify, Response
 from github import Github
-from service.llm.gemini_llm_service import GeminiLLMService
+from service.llm.gpt_llm_service import GPTLLMService
 from service.review_service import ReviewService
 from service.rag_service import RAGService
 from langchain_core.documents import Document
@@ -9,11 +9,11 @@ from langchain_core.documents import Document
 app = Flask(__name__)
 
 github_token = os.environ.get("GITHUB_TOKEN")
-if not github_token:
-    raise ValueError("GITHUB_TOKEN environment variable not set.")
+# if not github_token:
+#     raise ValueError("GITHUB_TOKEN environment variable not set.")
 g = Github(github_token)
 
-llm_service = GeminiLLMService()
+llm_service = GPTLLMService()
 review_service = ReviewService()
 rag_service = RAGService()
 

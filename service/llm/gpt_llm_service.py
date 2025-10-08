@@ -5,8 +5,8 @@ from openai import OpenAI
 class GPTLLMService:
     def __init__(self):
         api_key = os.environ.get("OPENAI_API_KEY")
-        if not api_key:
-            raise ValueError("OPENAI_API_KEY environment variable not set.")
+        # if not api_key:
+        #     raise ValueError("OPENAI_API_KEY environment variable not set.")
         self.client = OpenAI(api_key=api_key)
         self.model = os.environ.get("OPENAI_MODEL", "gpt-5")
 
