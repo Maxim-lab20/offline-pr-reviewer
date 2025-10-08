@@ -1,27 +1,17 @@
 from agents.code_review_agents import CodeReviewAgent
-from service.gemini_llm_service import GeminiLLMService
+from service.gpt_llm_service import GPTLLMService
 from typing_extensions import override
+from pathlib import Path
 
 
 class JavaCodeReviewAgent(CodeReviewAgent):
     def __init__(self):
-        self.llm_service = GeminiLLMService()
+        self.llm_service = GPTLLMService()
 
     @override
     def review(self, code_snippet: str, context: str = "") -> str:
-        full_prompt = f"""Context: {context}
-
-        You are a Java code review agent.
-        Please review the following code snippet provided between the special characters `***START_CODE***` and `***END_CODE***`. 
-        Identify issues taking in consideration:
-        1. provided context
-        2. java best practices
-
-        Come up with short and concise suggestions.
-
-        ***START_CODE***
-        {code_snippet}
-        ***END_CODE***
-        """
+        prompt_path = Path(__file__).parent / "prompts" / "java_review_prompt.txt"
+        template = prompt_path.read_text(encoding="utf-8")
+        full_prompt = template.format(context=context, code_snippet=code_snippet)
         review_result = self.llm_service.ask(full_prompt)
         return review_result

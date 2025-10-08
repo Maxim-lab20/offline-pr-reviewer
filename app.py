@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response
 from github import Github
 from service.gemini_llm_service import GeminiLLMService
 from service.review_service import ReviewService
@@ -29,14 +29,12 @@ def ask():
 
 @app.route("/review", methods=["POST"])
 def review_pr():
-    data = request.get_json()
-    code_snippet = data.get("code_snippet", "")
-    if not code_snippet:
+    code_snippet = request.get_data(as_text=True) or ""
+    if not code_snippet.strip():
         return jsonify({"error": "No code snippet provided"}), 400
 
     review_result = review_service.decide_and_review(code_snippet)
-
-    return jsonify({"review": review_result})
+    return Response(review_result or "", mimetype='text/plain')
 
 @app.route("/ingest", methods=["POST"])
 def ingest_documents_endpoint():
