@@ -21,6 +21,19 @@ class RAGService:
 
         # Add docs into Weaviate
         with weaviate.connect_to_local() as client:
+            # Clear existing data to ensure new ingests override previous ones
+            try:
+                collection = client.collections.get(self.index_name)
+                # Delete all objects that have the text field (effectively clears collection)
+                collection.data.delete_many(
+                    where={
+                        "operator": "IsNotNull",
+                        "path": [self.text_key]
+                    }
+                )
+            except Exception:
+                # If collection does not exist yet, proceed to creation on add
+                pass
             vectorstore = WeaviateVectorStore(
                 client=client,
                 index_name=self.index_name,
