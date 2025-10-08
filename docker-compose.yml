@@ -1,3 +1,5 @@
+version: '3.9'
+
 services:
   # disable offline llm version for now
   # ollama:
