@@ -1,7 +1,7 @@
 import os
 from flask import Flask, request, jsonify, Response
 from github import Github
-from service.gemini_llm_service import GeminiLLMService
+from service.llm.gemini_llm_service import GeminiLLMService
 from service.review_service import ReviewService
 from service.rag_service import RAGService
 from langchain_core.documents import Document

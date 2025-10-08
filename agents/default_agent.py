@@ -1,5 +1,5 @@
 from agents.code_review_agents import CodeReviewAgent
-from service.gemini_llm_service import GeminiLLMService
+from service.llm.gemini_llm_service import GeminiLLMService
 from typing_extensions import override
 
 

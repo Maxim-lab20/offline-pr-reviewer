@@ -1,5 +1,5 @@
 from agents.code_review_agents import CodeReviewAgent
-from service.gpt_llm_service import GPTLLMService
+from service.llm.gpt_llm_service import GPTLLMService
 from typing_extensions import override
 from pathlib import Path
 
