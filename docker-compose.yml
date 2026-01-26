@@ -1,0 +1,42 @@
+version: '3.3'
+
+services:
+  # disable offline llm version for now
+  # ollama:
+  #   image: ollama/ollama
+  #   container_name: ollama
+  #   ports:
+  #     - "11434:11434"
+  #   volumes:
+  #     - ollama_models:/root/.ollama
+  #   restart: unless-stopped
+
+  pr-offline-reviewer:
+    build: .
+    container_name: pr-offline-reviewer
+    ports:
+      - "5000:5000"
+    # environment:
+      # OLLAMA_HOST: http://ollama:11434
+    # depends_on:
+      # - ollama
+    restart: unless-stopped
+
+  weaviate:
+    image: semitechnologies/weaviate:1.27.0
+    ports:
+      - "8080:8080"
+      - "50051:50051"
+    environment:
+      QUERY_DEFAULTS_LIMIT: 25
+      AUTHENTICATION_APIKEY_ENABLED: 'false'
+      PERSISTENCE_DATA_PATH: '/var/lib/weaviate'
+      DEFAULT_VECTORIZER_MODULE: 'none'
+      ENABLE_MODULES: ''
+      CLUSTER_HOSTNAME: 'node1'
+    volumes:
+      - weaviate_data:/var/lib/weaviate
+    restart: unless-stopped
+
+volumes:
+  weaviate_data:
